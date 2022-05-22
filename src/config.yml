@@ -1,0 +1,7 @@
+# Язык по умолчанию. Варианты: EN, RU
+default-locale: RU
+
+# Сообщения при смене языка
+language-changed-messages:
+  ru: "&8&l| &aЯзык успешно сменён!"
+  en: "&8&l| &aLanguage successfully changed!"
