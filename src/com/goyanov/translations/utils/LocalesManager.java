@@ -61,18 +61,23 @@ public class LocalesManager implements Listener
         }
     }
 
-    @EventHandler
-    public void loadLocalesOnJoin(PlayerJoinEvent e)
+    public static void loadPlayerLocaleFromConfig(Player p)
     {
-        String key = e.getPlayer().getUniqueId().toString();
+        String key = p.getUniqueId().toString();
         if (playersLocalesConfig.contains(key))
         {
-            PLAYERS_LOCALES.put(e.getPlayer(), Locale.valueOf(playersLocalesConfig.getString(key)));
+            PLAYERS_LOCALES.put(p, Locale.valueOf(playersLocalesConfig.getString(key)));
         }
         else
         {
-            PLAYERS_LOCALES.put(e.getPlayer(), defaultLocale);
+            PLAYERS_LOCALES.put(p, defaultLocale);
         }
+    }
+
+    @EventHandler
+    public void loadLocalesOnJoin(PlayerJoinEvent e)
+    {
+        loadPlayerLocaleFromConfig(e.getPlayer());
     }
 
     @EventHandler
