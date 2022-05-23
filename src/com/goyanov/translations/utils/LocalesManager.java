@@ -20,7 +20,7 @@ public class LocalesManager implements Listener
     private static Locale defaultLocale;
 
     private static final File usersLocalesFile;
-    private static final FileConfiguration playersLocalesConfig;
+    protected static final FileConfiguration playersLocalesConfig;
 
     private static final HashMap<Player, Locale> PLAYERS_LOCALES = new HashMap<>();
 

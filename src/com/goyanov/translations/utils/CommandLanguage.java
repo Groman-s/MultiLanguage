@@ -1,11 +1,11 @@
 package com.goyanov.translations.utils;
 
 import com.goyanov.translations.main.MultiLanguageAPI;
-import com.goyanov.translations.utils.LocalesManager;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import static com.goyanov.translations.utils.LocalesManager.*;
 
 public class CommandLanguage implements CommandExecutor
 {
@@ -29,14 +29,17 @@ public class CommandLanguage implements CommandExecutor
             return true;
         }
 
+        Player p = (Player) sender;
+        Locale newLocale;
+
         if (args[0].equalsIgnoreCase("ru"))
         {
-            LocalesManager.setPlayerLocale((Player)sender, LocalesManager.Locale.RU);
+            newLocale = Locale.RU;
             sender.sendMessage(MultiLanguageAPI.inst().getConfig().getString("language-changed-messages.ru").replace("&","§"));
         }
         else if (args[0].equalsIgnoreCase("en"))
         {
-            LocalesManager.setPlayerLocale((Player)sender, LocalesManager.Locale.EN);
+            newLocale = Locale.EN;
             sender.sendMessage(MultiLanguageAPI.inst().getConfig().getString("language-changed-messages.en").replace("&","§"));
         }
         else
@@ -44,6 +47,8 @@ public class CommandLanguage implements CommandExecutor
             showHelp(sender);
             return true;
         }
+        setPlayerLocale(p, newLocale);
+        LocalesManager.playersLocalesConfig.set(p.getUniqueId().toString(), newLocale.toString());
         LocalesManager.savePlayersLocalesConfig();
         return true;
     }

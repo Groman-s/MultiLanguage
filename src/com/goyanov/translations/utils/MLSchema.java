@@ -2,7 +2,6 @@ package com.goyanov.translations.utils;
 
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.ComponentBuilder;
-import net.minecraft.network.chat.ChatMessage;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
@@ -11,18 +10,18 @@ import static com.goyanov.translations.utils.LocalesManager.*;
 
 import java.io.File;
 
-public abstract class MLSender
+public abstract class MLSchema
 {
     private FileConfiguration englishConfig;
     private FileConfiguration russianConfig;
     private final boolean replaceColorCodes;
 
-    public MLSender(JavaPlugin plugin)
+    public MLSchema(JavaPlugin plugin)
     {
         this(plugin, true);
     }
 
-    public MLSender(JavaPlugin plugin, boolean replaceColorCodes)
+    public MLSchema(JavaPlugin plugin, boolean replaceColorCodes)
     {
         if (getEnglishFileName() != null)
         {
@@ -41,7 +40,7 @@ public abstract class MLSender
 
     protected abstract String getRussianFileName();
 
-    private String getConfigMessage(Player p, String messageKey)
+    public String getConfigMessage(Player p, String messageKey)
     {
         String message = null;
         if (getPlayerLocale(p) == Locale.EN && englishConfig != null) message = englishConfig.getString(messageKey);
