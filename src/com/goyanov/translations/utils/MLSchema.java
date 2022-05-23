@@ -52,7 +52,7 @@ public abstract class MLSchema
     public final void sendChatMessage(Player p, String messageKey)
     {
         String message = getConfigMessage(p, messageKey);
-        if (message != null) p.sendMessage();
+        if (message != null) p.sendMessage(message);
     }
 
     public final void sendActionBarMessage(Player p, String messageKey)
