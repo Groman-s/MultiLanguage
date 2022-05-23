@@ -1,6 +1,6 @@
 package com.goyanov.translations.main;
 
-import com.goyanov.translations.utils.CommanLanguageTabCompleter;
+import com.goyanov.translations.utils.CommandLanguageTabCompleter;
 import com.goyanov.translations.utils.CommandLanguage;
 import com.goyanov.translations.utils.LocalesManager;
 import org.bukkit.Bukkit;
@@ -31,6 +31,6 @@ public class MultiLanguageAPI extends JavaPlugin
         getServer().getPluginManager().registerEvents(new LocalesManager(), this);
 
         getCommand("language").setExecutor(new CommandLanguage());
-        getCommand("language").setTabCompleter(new CommanLanguageTabCompleter());
+        getCommand("language").setTabCompleter(new CommandLanguageTabCompleter());
     }
 }
