@@ -2,8 +2,3 @@ name: MultiLanguageAPI
 main: com.goyanov.translations.main.MultiLanguageAPI
 version: 1.0.0
 api-version: 1.13
-commands:
-  language:
-    description: "§3Изменить язык сообщений сервера"
-    permission: MultiLanguageAPI.language
-    permission-message: "§4Нет прав!"

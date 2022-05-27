@@ -1,4 +1,4 @@
-package com.goyanov.translations.utils;
+package com.goyanov.translations.schemas;
 
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.ChatMessageType;
@@ -7,47 +7,47 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
-import static com.goyanov.translations.utils.LocalesManager.*;
 
 import java.io.File;
+import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public abstract class MLSchema
+public class MLSchema
 {
     private final JavaPlugin plugin;
-    private FileConfiguration englishConfig;
-    private FileConfiguration russianConfig;
+    private final String fileName;
     private final boolean replaceColorCodes;
+    private static final HashMap<String, FileConfiguration> localesConfigs = new HashMap<>();
 
-    public MLSchema(JavaPlugin plugin)
+    public MLSchema(JavaPlugin plugin, String fileName)
     {
-        this(plugin, true);
+        this(plugin, fileName, true);
     }
 
-    public MLSchema(JavaPlugin plugin, boolean replaceColorCodes)
+    public MLSchema(JavaPlugin plugin, String fileName, boolean replaceColorCodes)
     {
         this.plugin = plugin;
-        this.reloadConfigs();
+        this.fileName = fileName.replace(".yml", "");
         this.replaceColorCodes = replaceColorCodes;
+        this.reloadConfigs();
     }
 
     public void reloadConfigs()
     {
-        if (getEnglishFileName() != null)
+        for (File file : plugin.getDataFolder().listFiles())
         {
-            englishConfig = YamlConfiguration.loadConfiguration(new File(plugin.getDataFolder() + File.separator + getEnglishFileName()));
+            String name = file.getName();
+            if (name.matches(fileName + "_..\\.yml"))
+            {
+                localesConfigs.put(name.substring(name.indexOf("_") + 1, name.indexOf(".")), YamlConfiguration.loadConfiguration(file));
+            }
         }
-
-        if (getRussianFileName() != null)
+        if (localesConfigs.size() == 0)
         {
-            russianConfig = YamlConfiguration.loadConfiguration(new File(plugin.getDataFolder() + File.separator + getRussianFileName()));
+            localesConfigs.put("default", YamlConfiguration.loadConfiguration(new File(plugin.getDataFolder() + File.separator + fileName + ".yml")));
         }
     }
-
-    protected abstract String getEnglishFileName();
-
-    protected abstract String getRussianFileName();
 
     private String getColoredMessage(String message)
     {
@@ -66,8 +66,20 @@ public abstract class MLSchema
     public String getConfigMessage(Player p, String messageKey)
     {
         String message = null;
-        if (getPlayerLocale(p) == Locale.EN && englishConfig != null) message = englishConfig.getString(messageKey);
-        else if (getPlayerLocale(p) == Locale.RU && russianConfig != null) message = russianConfig.getString(messageKey);
+        String locale = p.getLocale().split("_")[0];
+        FileConfiguration config;
+
+        if
+        (
+            (config = localesConfigs.get(locale)) != null       ||
+            (config = localesConfigs.get("en")) != null         ||
+            (config = localesConfigs.get("ru")) != null         ||
+            (config = localesConfigs.get("default")) != null
+        )
+        {
+            message = config.getString(messageKey);
+        }
+
         if (message != null && replaceColorCodes) message = getColoredMessage(message);
         return message;
     }
