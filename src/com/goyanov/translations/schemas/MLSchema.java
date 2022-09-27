@@ -49,7 +49,7 @@ public class MLSchema
         }
     }
 
-    private String getColoredMessage(String message)
+    public static String getColoredMessage(String message)
     {
         message = message.replace("&", "§");
         Pattern pattern = Pattern.compile("#[a-fA-F0-9]{6}");
@@ -61,6 +61,25 @@ public class MLSchema
             matcher = pattern.matcher(message);
         }
         return message;
+    }
+
+    public FileConfiguration getLocalizedConfig(Player p)
+    {
+        String locale = p.getLocale().split("_")[0];
+        FileConfiguration config;
+
+        if
+        (
+            (config = localesConfigs.get(locale)) != null       ||
+            (config = localesConfigs.get("en")) != null         ||
+            (config = localesConfigs.get("ru")) != null         ||
+            (config = localesConfigs.get("default")) != null
+        )
+        {
+            return config;
+        }
+
+        return null;
     }
 
     public String getConfigMessage(Player p, String messageKey)
@@ -94,5 +113,11 @@ public class MLSchema
     {
         String message = getConfigMessage(p, messageKey);
         if (message != null) p.spigot().sendMessage(ChatMessageType.ACTION_BAR, new ComponentBuilder(message).create());
+    }
+
+    public final void sendTitleMessage(Player p, String messageKey, int duration)
+    {
+        String message = getConfigMessage(p, messageKey);
+        if (message != null) p.sendTitle(" ", message, 5, duration, 5);
     }
 }
