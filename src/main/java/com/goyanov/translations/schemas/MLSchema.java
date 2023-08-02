@@ -18,7 +18,7 @@ public class MLSchema
     private final JavaPlugin plugin;
     private final String fileName;
     private final boolean replaceColorCodes;
-    private static final HashMap<String, FileConfiguration> localesConfigs = new HashMap<>();
+    private final HashMap<String, FileConfiguration> localesConfigs = new HashMap<>();
 
     public MLSchema(JavaPlugin plugin, String fileName)
     {
@@ -28,7 +28,7 @@ public class MLSchema
     public MLSchema(JavaPlugin plugin, String fileName, boolean replaceColorCodes)
     {
         this.plugin = plugin;
-        this.fileName = fileName.replace(".yml", "");
+        this.fileName = fileName.replaceAll("(_..)?(\\.yml)?", "");
         this.replaceColorCodes = replaceColorCodes;
         this.reloadConfigs();
     }
