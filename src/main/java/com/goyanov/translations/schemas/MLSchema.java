@@ -1,15 +1,15 @@
 package com.goyanov.translations.schemas;
 
 import net.md_5.bungee.api.ChatColor;
-import net.md_5.bungee.api.ChatMessageType;
-import net.md_5.bungee.api.chat.ComponentBuilder;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -17,20 +17,18 @@ public class MLSchema
 {
     private final JavaPlugin plugin;
     private final String fileName;
-    private final boolean replaceColorCodes;
     private final HashMap<String, FileConfiguration> localesConfigs = new HashMap<>();
 
     public MLSchema(JavaPlugin plugin, String fileName)
     {
-        this(plugin, fileName, true);
-    }
-
-    public MLSchema(JavaPlugin plugin, String fileName, boolean replaceColorCodes)
-    {
         this.plugin = plugin;
         this.fileName = fileName.replaceAll("(_..)?(\\.yml)?", "");
-        this.replaceColorCodes = replaceColorCodes;
         this.reloadConfigs();
+    }
+
+    public Collection<FileConfiguration> getAllConfigs()
+    {
+        return localesConfigs.values();
     }
 
     public void reloadConfigs()
@@ -43,13 +41,13 @@ public class MLSchema
                 localesConfigs.put(name.substring(name.indexOf("_") + 1, name.indexOf(".")), YamlConfiguration.loadConfiguration(file));
             }
         }
-        if (localesConfigs.size() == 0)
+        if (localesConfigs.isEmpty())
         {
             localesConfigs.put("default", YamlConfiguration.loadConfiguration(new File(plugin.getDataFolder() + File.separator + fileName + ".yml")));
         }
     }
 
-    public static String getColoredMessage(String message)
+    private String getColoredMessage(String message)
     {
         message = message.replace("&", "§");
         Pattern pattern = Pattern.compile("#[a-fA-F0-9]{6}");
@@ -82,42 +80,17 @@ public class MLSchema
         return null;
     }
 
-    public String getConfigMessage(Player p, String messageKey)
+    public String getConfigString(Player p, String configKey)
     {
-        String message = null;
-        String locale = p.getLocale().split("_")[0];
-        FileConfiguration config;
-
-        if
-        (
-            (config = localesConfigs.get(locale)) != null       ||
-            (config = localesConfigs.get("en")) != null         ||
-            (config = localesConfigs.get("ru")) != null         ||
-            (config = localesConfigs.get("default")) != null
-        )
-        {
-            message = config.getString(messageKey);
-        }
-
-        if (message != null && replaceColorCodes) message = getColoredMessage(message);
+        String message = getLocalizedConfig(p).getString(configKey);
+        if (message != null) message = getColoredMessage(message);
         return message;
     }
 
-    public final void sendChatMessage(Player p, String messageKey)
+    public List<String> getConfigStringList(Player p, String configKey)
     {
-        String message = getConfigMessage(p, messageKey);
-        if (message != null) p.sendMessage(message);
-    }
-
-    public final void sendActionBarMessage(Player p, String messageKey)
-    {
-        String message = getConfigMessage(p, messageKey);
-        if (message != null) p.spigot().sendMessage(ChatMessageType.ACTION_BAR, new ComponentBuilder(message).create());
-    }
-
-    public final void sendTitleMessage(Player p, String messageKey, int duration)
-    {
-        String message = getConfigMessage(p, messageKey);
-        if (message != null) p.sendTitle(" ", message, 5, duration, 5);
+        List<String> messages = getLocalizedConfig(p).getStringList(configKey);
+        messages.replaceAll(this::getColoredMessage);
+        return messages;
     }
 }
